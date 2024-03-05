@@ -1,11 +1,14 @@
 import Add from "../img/addAvatar.png"
 import {  createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import {auth ,storage} from "../firebase"
+import {auth ,storage,db} from "../firebase"
 import { useState } from "react";
  import {  ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+ import { doc, setDoc } from "firebase/firestore"; 
+import {Link, useNavigate} from "react-router-dom";
 
 const Register = () => {
  const [err,setErr] = useState(false);
+ const navigate = useNavigate();
 
 const handleSubmit = async(e)=>{
   e.preventDefault()
@@ -18,25 +21,31 @@ const handleSubmit = async(e)=>{
 try {
   const res = await createUserWithEmailAndPassword(auth, email, password)
 
- 
-const storageRef = ref(storage, displayName);
+  const date = new Date().getTime();
+const storageRef = ref(storage, `${displayName + date}`);
 
-const uploadTask = uploadBytesResumable(storageRef, file);
-
-uploadTask.on(
-  (error) => {
-    setErr(true)
-  }, 
-  () => {
-    
-    getDownloadURL(uploadTask.snapshot.ref).then(async(downloadURL) => {
+await uploadBytesResumable(storageRef, file).then(()=>{
+  getDownloadURL(storageRef).then(async (downloadURL)=> {
+    try {
       await updateProfile(res.user,{
         displayName,
         photoURL:downloadURL,
-      })
-    });
-  }
-);
+      });
+
+      await setDoc(doc(db, "users", res.user.uid),{
+        uid :res.user.uid,
+        displayName,
+        email,
+        photoURL:downloadURL,
+     });
+await setDoc(doc(db, "userChats",res.user.uid ),{});
+navigate("/")
+
+    } catch (error) {
+      console.log(error)
+    }
+  })
+})
 
 
 } catch (error) {
@@ -67,7 +76,7 @@ uploadTask.on(
                 {err && <span>Something went wrong </span>}
                 
             </form>
-            <p>You do have account? Login</p>
+            <p>You do have account? <Link to="/login" >Login</Link> </p>
         </div>
     </div>
   )

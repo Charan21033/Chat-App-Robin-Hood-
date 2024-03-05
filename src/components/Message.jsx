@@ -1,23 +1,41 @@
-import React from 'react'
+import { useContext, useEffect, useRef } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { ChatContext } from "../context/ChatContext";
 
-const Message = () => {
+const Message = ({ message }) => {
+  console.log(message);
+  const { currentUser } = useContext(AuthContext);
+  const { data } = useContext(ChatContext);
+
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message]);
+
   return (
-    <div className='message owner' > 
-    <div className='messageInfo' >  
-    <img  src='https://th.bing.com/th?id=OSK.nqo0beSZclyct_NTFa_KzfWFpFwiuSBASw7M3qysuNg&w=200&h=200&c=7&rs=1&o=6&dpr=1.3&pid=SANGAM' />
-    <span>just now </span>
+    <div
+      ref={ref}
+      className={`message ${message.senderId === currentUser.uid && "owner"}`}
+    >
+      <div className="messageInfo">
+        <img
+          src={
+            message.senderId === currentUser.uid
+              ? currentUser.photoURL
+              : data.user.photoURL
+          }
+          alt=""
+        />
+        <span>just now </span>
+      </div>
+
+      <div className="messageContent">
+        <p> {message.text} </p>
+        {message.img && <img src={message.img} alt="" />}
+      </div>
     </div>
+  );
+};
 
-    <div className='messageContent' >  
-     <p> hello </p>
-     <img src='https://th.bing.com/th?id=OSK.nqo0beSZclyct_NTFa_KzfWFpFwiuSBASw7M3qysuNg&w=200&h=200&c=7&rs=1&o=6&dpr=1.3&pid=SANGAM' />
-
-    </div>
-     </div>
-    
-
-
-  )
-}
-
-export default Message
+export default Message;
