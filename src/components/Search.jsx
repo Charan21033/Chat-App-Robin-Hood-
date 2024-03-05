@@ -4,64 +4,55 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
+  setDoc,
   doc,
+  updateDoc,
   serverTimestamp,
   getDoc,
-  setDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { AuthContext } from "../context/AuthContext";
-
 const Search = () => {
-  const [userName, setUserName] = useState("");
+  const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
   const [err, setErr] = useState(false);
-  const [nil, setNill] = useState(false);
+
   const { currentUser } = useContext(AuthContext);
 
   const handleSearch = async () => {
-    const UserRef = collection(db, "users");
-    // console.log(q)
-    const q = query(UserRef, where("displayName", "==", `${userName}`));
-    console.log("q", q, q.displayName);
-    console.log(userName); // Check the value of userName
+    const q = query(
+      collection(db, "users"),
+      where("displayName", "==", username)
+    );
 
     try {
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.size);
-      console.log(querySnapshot.docs);
       querySnapshot.forEach((doc) => {
         setUser(doc.data());
       });
-
-      if (querySnapshot.size === 0) setNill(true);
-      else setNill(false);
-    } catch (error) {
-      console.error("error fetching users:", error);
+    } catch (err) {
       setErr(true);
     }
   };
 
   const handleKey = (e) => {
-    if (e.code === "Enter") {
-      handleSearch();
-    }
+    e.code === "Enter" && handleSearch();
   };
 
   const handleSelect = async () => {
+    //check whether the group(chats in firestore) exists, if not create
     const combinedId =
       currentUser.uid > user.uid
         ? currentUser.uid + user.uid
         : user.uid + currentUser.uid;
     try {
       const res = await getDoc(doc(db, "chats", combinedId));
+
       if (!res.exists()) {
-        //creating  a chat in chats ....
+        //create a chat in chats collection
+        await setDoc(doc(db, "chats", combinedId), { messages: [] });
 
-        await setDoc(doc (db, "chats", combinedId), { messages: [] });
-        //// creating user chats updates..
-
+        //create user chats
         await updateDoc(doc(db, "userChats", currentUser.uid), {
           [combinedId + ".userInfo"]: {
             uid: user.uid,
@@ -70,6 +61,7 @@ const Search = () => {
           },
           [combinedId + ".date"]: serverTimestamp(),
         });
+
         await updateDoc(doc(db, "userChats", user.uid), {
           [combinedId + ".userInfo"]: {
             uid: currentUser.uid,
@@ -79,13 +71,11 @@ const Search = () => {
           [combinedId + ".date"]: serverTimestamp(),
         });
       }
-    } catch (error) {
-      console.log(error);
-    }
-    setUser(null)
-    setUserName("")
+    } catch (err) {}
+
+    setUser(null);
+    setUsername("")
   };
-    
   return (
     <div className="search">
       <div className="searchForm">
@@ -93,15 +83,14 @@ const Search = () => {
           type="text"
           placeholder="Find a user"
           onKeyDown={handleKey}
-          onChange={(e) => setUserName(e.target.value)}
-          value={userName}
+          onChange={(e) => setUsername(e.target.value)}
+          value={username}
         />
       </div>
-      {err && <span>Technical Error !!!</span>}
-      {nil && <span>No user Found </span>}
+      {err && <span>User not found!</span>}
       {user && (
         <div className="userChat" onClick={handleSelect}>
-          <img src={user.photoURL} alt={user.displayName} />
+          <img src={user.photoURL} alt="" />
           <div className="userChatInfo">
             <span>{user.displayName}</span>
           </div>
