@@ -5,10 +5,13 @@ import { useState } from "react";
  import {  ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
  import { doc, setDoc } from "firebase/firestore"; 
 import {Link, useNavigate} from "react-router-dom";
+import CustomAlert from '../components/CustomAlert';
 
 const Register = () => {
  const [err,setErr] = useState(false);
  const [loading, setLoading] = useState(false);
+ const [showAlert, setShowAlert] = useState(false);
+ const [alertMessage, setAlertMessage] = useState('');
  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,6 +21,14 @@ const Register = () => {
     const email = e.target[1].value;
     const password = e.target[2].value;
     const file = e.target[3].files[0];
+
+    if (!file) {
+      setAlertMessage("Please select a file to upload.");
+      setShowAlert(true);
+      setLoading(false);
+      return;
+    
+   }
 
     try {
       //Create user
@@ -86,6 +97,7 @@ window.location.reload();
             </form>
             <p>You do have account? <Link to="/login" >Login</Link> </p>
         </div>
+        {showAlert && <CustomAlert message={alertMessage} onClose={() => setShowAlert(false)} />}
     </div>
   );
 };
