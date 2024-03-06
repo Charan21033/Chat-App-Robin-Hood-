@@ -5,7 +5,10 @@ import {
   } from "react";
   import { AuthContext } from "./AuthContext";
   
-  export const ChatContext = createContext();
+  export const ChatContext = createContext(
+
+    
+  );
   
   export const ChatContextProvider = ({ children }) => {
     const { currentUser } = useContext(AuthContext);
@@ -24,6 +27,7 @@ import {
                 ? currentUser.uid + action.payload.uid
                 : action.payload.uid + currentUser.uid,
           };
+          console.log("cchatId",chatId)
   
         default:
           return state;
