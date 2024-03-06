@@ -22,7 +22,7 @@ const Chats = () => {
 }
    currentUser.uid && getChats()
   },[currentUser.uid])
-  console.log("chats",Object.entries(chats))
+  // console.log("chats",Object.entries(chats))
 
 const handleSelect = (u)=>{
   dispatch({type:"CHANGE_USER", payload: u})

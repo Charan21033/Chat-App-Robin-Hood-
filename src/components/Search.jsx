@@ -24,13 +24,13 @@ const Search = () => {
     const UserRef = collection(db, "users");
     // console.log(q)
     const q = query(UserRef, where("displayName", "==", `${userName}`));
-    console.log("q", q, q.displayName);
-    console.log(userName); // Check the value of userName
+    // console.log("q", q, q.displayName);
+    // console.log(userName); // Check the value of userName
 
     try {
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.size);
-      console.log(querySnapshot.docs);
+      // console.log(querySnapshot.size);
+      // console.log(querySnapshot.docs);
       querySnapshot.forEach((doc) => {
         setUser(doc.data());
       });

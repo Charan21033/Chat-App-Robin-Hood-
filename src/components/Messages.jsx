@@ -16,7 +16,7 @@ useEffect (()=>{
     unSub();
   }
 },[data.chatId])
-console.log(messages)
+// console.log(messages)
 
   return (
     <div className='messages' >

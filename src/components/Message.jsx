@@ -6,10 +6,10 @@ const Message = ({ message }) => {
   
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
-  console.log("image" , message.senderTd === currentUser.uid
-  ? currentUser.photoURL
-  : data.user.photoURL)
-  console.log("message", message);
+  // console.log("image" , message.senderTd === currentUser.uid
+  // ? currentUser.photoURL
+  // : data.user.photoURL)
+  // console.log("message", message);
 
   const ref = useRef();
 

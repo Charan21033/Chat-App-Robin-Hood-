@@ -17,7 +17,7 @@ const ProtectedRoute = ({children}) =>{
 }
 
 
-console.log(currentUser)
+// console.log(currentUser)
   return (
     <BrowserRouter>
     <Routes>

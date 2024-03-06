@@ -27,7 +27,7 @@ import {
                 ? currentUser.uid + action.payload.uid
                 : action.payload.uid + currentUser.uid,
           };
-          console.log("cchatId",chatId)
+          // console.log("cchatId",chatId)
   
         default:
           return state;
